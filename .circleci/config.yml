@@ -28,3 +28,33 @@ jobs:
           command: |
             ./jfrog rt gradle 'clean install artifactoryPublish' gradle.conf  --build-name=circleci-gradle-artifactory --build-number=$CIRCLE_BUILD_NUM
 
+      - run:
+          name: Collect the environment variables 
+          command: |
+            ./jfrog rt bce circleci-gradle-artifactory $CIRCLE_BUILD_NUM 
+                  
+      - run:
+          name: Add sonar
+          command: |
+            ./jfrog rt sp "gradle-dev-local/org/jfrog/example/gradle/" "qulity.gate.sonarUrl=http://ip:9000/dashboard/index/circleci-gradle-artifactory"
+        
+      - run:
+          name: Add properties
+          command: |
+            ./jfrog rt sp "gradle-dev-local/org/jfrog/example/gradle/" "deploy.tool=ansible"
+            ./jfrog rt sp "gradle-dev-local/org/jfrog/example/gradle/" "ip=127.0.0.1"
+            
+      - run:
+          name: Pass the build information to Artifactory   
+          command: |
+            ./jfrog rt bp circleci-gradle-artifactory $CIRCLE_BUILD_NUM 
+   
+      - run:
+          name: Promote  
+          command: |
+            ./jfrog rt bpr circleci-gradle-artifactory $CIRCLE_BUILD_NUM gradle-pro-local
+  
+      - run:
+          name: Xray Scan 
+          command: |
+            ./jfrog rt bs circleci-gradle-artifactory $CIRCLE_BUILD_NUM --fail=false
