@@ -16,3 +16,15 @@ jobs:
           command: |
             mvn -version
             gradle -version
+            
+      - run:
+          name: Config
+          command: |
+            ./jfrog rt config --url $ARTIFACTORY_URL --user $ARTIFACTORY_USER --apikey $ARTIFACTORY_APIKEY --interactive=false
+            ./jfrog rt c show
+            
+      - run:
+          name: Gradle install
+          command: |
+            ./jfrog rt gradle 'clean install artifactoryPublish' gradle.conf  --build-name=circleci-gradle-artifactory --build-number=$CIRCLE_BUILD_NUM
+
