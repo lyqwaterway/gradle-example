@@ -26,7 +26,7 @@ jobs:
       - run:
           name: Gradle install 
           command: |
-            ./jfrog rt gradle 'clean install artifactoryPublish' gradle.conf  --build-name=circleci-gradle-artifactory --build-number=$CIRCLE_BUILD_NUM
+            ./jfrog rt gradle clean artifactoryPublish -b gradle.conf  --build-name=circleci-gradle-artifactory --build-number=$CIRCLE_BUILD_NUM
 
       - run:
           name: Collect the environment variables 
